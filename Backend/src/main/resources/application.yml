@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: Backend
+  datasource:
+     url: ${DB_URL:jdbc:postgresql://localhost:5433/devpilot}  # ether user DB_URL or this Default
+     username: ${DB_USERNAME:postgres}
+     password: ${DB_PASSWORD:postgres}
+     driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        model: gpt-4o-mini
+      embedding:
+        model: text-embedding-3-small
