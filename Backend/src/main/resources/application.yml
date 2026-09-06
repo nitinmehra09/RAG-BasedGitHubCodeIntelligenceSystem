@@ -2,7 +2,7 @@ spring:
   application:
     name: Backend
   datasource:
-     url: ${DB_URL:jdbc:postgresql://localhost:5433/devpilot}  # ether user DB_URL or this Default
+     url: ${DB_URL:jdbc:postgresql://localhost:5433/devpilot}  # either use DB_URL or this Default
      username: ${DB_USERNAME:postgres}
      password: ${DB_PASSWORD:postgres}
      driver-class-name: org.postgresql.Driver
@@ -22,3 +22,21 @@ spring:
         model: gpt-4o-mini
       embedding:
         model: text-embedding-3-small
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            scope:
+              - read:user
+              - user:email
+
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: login

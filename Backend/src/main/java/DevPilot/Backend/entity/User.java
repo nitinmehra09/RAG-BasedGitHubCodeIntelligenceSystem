@@ -15,26 +15,28 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    private UUID userId;
-    @Column(name = "github_id",unique = true,nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "github_id", unique = true, nullable = false)
     private long githubId;
 
-    @Column(name = "github_username",unique = true,nullable = false)
+    @Column(name = "github_username", unique = true, nullable = false)
     private String githubUsername;
 
-    @Column(name = "display_name",unique = false,nullable = false)
+    @Column(name = "display_name", nullable = false)
     private String displayName;
 
-    @Column(name = "avatar_url",length = 500)
+    @Column(name = "avatar_url", length = 500)
     private String avatarUrl;
 
-    @Column(name = "access_token",columnDefinition = "TEXT",nullable = false)
+    @Column(name = "access_token", columnDefinition = "TEXT", nullable = false)
     private String accessToken;
 
-    @Column(name = "token_scope",length = 500)
-    private String tokenScope;
+    @Column(name = "token_scope", length = 500)
+    private String tokenScopes;
 
-    @Column(name = "create_time",updatable = false,nullable = false)
+    @Column(name = "create_time", updatable = false, nullable = false)
     private Instant createdAt;
 
     @PrePersist
@@ -43,6 +45,5 @@ public class User {
             createdAt = Instant.now();
         }
     }
-
 
 }
