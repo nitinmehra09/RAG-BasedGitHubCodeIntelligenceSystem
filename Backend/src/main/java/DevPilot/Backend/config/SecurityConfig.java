@@ -38,6 +38,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/",
+                                "/actuator/**",
                                 "/api/auth/login-url",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
