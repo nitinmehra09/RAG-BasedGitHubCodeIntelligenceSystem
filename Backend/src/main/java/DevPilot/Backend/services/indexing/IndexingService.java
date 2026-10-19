@@ -105,9 +105,7 @@ public class IndexingService {
             }
 
             processed++;
-            if (processed % PROGRESS_EVERY_N_FILES == 0 || processed == filePaths.size()) {
-                updateProgress(repoId, filePaths.size(), processed, totalChunks, IndexStatus.INDEXING, null);
-            }
+            updateProgress(repoId, filePaths.size(), processed, totalChunks, IndexStatus.INDEXING, null);
             rateLimiter.pause();
         }
 
