@@ -54,6 +54,9 @@ public class ChatStreamHandler {
                     .doOnNext(token -> appendToken(emitter, fullReply, token))
                     .doOnError(err -> {
                         log.error("Chat stream error", err);
+                        try {
+                            emitter.send(SseEmitter.event().name("error").data(err.getMessage() != null ? err.getMessage() : "Error streaming response"));
+                        } catch (Exception ignored) {}
                         emitter.completeWithError(err);
                     })
                     .doOnComplete(() -> completeStream(

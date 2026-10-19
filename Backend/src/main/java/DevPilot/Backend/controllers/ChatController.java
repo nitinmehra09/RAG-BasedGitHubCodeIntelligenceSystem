@@ -50,7 +50,7 @@ public class ChatController {
         return chatService.getMessages(userId, id);
     }
 
-    @PostMapping(value = "/sessions/{id}/messages", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping("/sessions/{id}/messages")
     public SseEmitter sendMessage(
             @PathVariable UUID id,
             @Valid @RequestBody ChatMessageRequest request) {
