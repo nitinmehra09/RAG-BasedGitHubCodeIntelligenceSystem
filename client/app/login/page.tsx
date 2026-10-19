@@ -74,7 +74,9 @@ const LoginContent = () => {
               <Alert variant="destructive">
                 <AlertCircle />
                 <AlertTitle>Sign-in failed</AlertTitle>
-                <AlertDescription>Please try again.</AlertDescription>
+                <AlertDescription>
+                  {error === "oauth_failed" ? "Please try again." : decodeURIComponent(error)}
+                </AlertDescription>
               </Alert>
             )}
 
