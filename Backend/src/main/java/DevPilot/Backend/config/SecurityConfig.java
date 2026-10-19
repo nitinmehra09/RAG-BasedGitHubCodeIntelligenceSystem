@@ -69,19 +69,21 @@ public class SecurityConfig {
     @Bean
     AuthenticationSuccessHandler oauth2SuccessHandler(
             @Value("${app.frontend-url}") String frontendUrl) {
+        String cleanUrl = frontendUrl.replaceAll("/+$", "");
         SimpleUrlAuthenticationSuccessHandler handler = new SimpleUrlAuthenticationSuccessHandler();
-        handler.setDefaultTargetUrl(frontendUrl + "/auth/callback");
+        handler.setDefaultTargetUrl(cleanUrl + "/auth/callback");
         return handler;
     }
 
     @Bean
     AuthenticationFailureHandler oauth2FailureHandler(
             @Value("${app.frontend-url}") String frontendUrl) {
+        String cleanUrl = frontendUrl.replaceAll("/+$", "");
         return (request, response, exception) -> {
             org.slf4j.LoggerFactory.getLogger(SecurityConfig.class)
                     .error("OAuth2 login failed: {}", exception.getMessage(), exception);
             String errorMsg = exception.getMessage() != null ? exception.getMessage() : "oauth_failed";
-            response.sendRedirect(frontendUrl + "/login?error=" + java.net.URLEncoder.encode(errorMsg, java.nio.charset.StandardCharsets.UTF_8));
+            response.sendRedirect(cleanUrl + "/login?error=" + java.net.URLEncoder.encode(errorMsg, java.nio.charset.StandardCharsets.UTF_8));
         };
     }
 }

@@ -1,6 +1,13 @@
 server:
   port: ${PORT:8080}
   forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        name: JSESSIONID
+        same-site: none
+        secure: true
+        http-only: true
 
 management:
   endpoints:
