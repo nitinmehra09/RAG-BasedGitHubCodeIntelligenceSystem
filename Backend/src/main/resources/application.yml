@@ -46,13 +46,15 @@ spring:
         options:
           model: ${AI_CHAT_MODEL:gemini-1.5-flash}
       embedding:
+        base-url: ${EMBEDDING_BASE_URL:http://localhost:8000/v1}
+        api-key: ${EMBEDDING_API_KEY:dummy-key}
         embeddings-path: ${EMBEDDINGS_PATH:/embeddings}
         options:
-          model: ${AI_EMBEDDING_MODEL:gemini-embedding-001}
-          dimensions: ${VECTOR_DIMENSIONS:768}
+          model: ${AI_EMBEDDING_MODEL:all-MiniLM-L6-v2}
+          dimensions: ${VECTOR_DIMENSIONS:384}
     vectorstore:
       pgvector:
-        dimensions: ${VECTOR_DIMENSIONS:768}
+        dimensions: ${VECTOR_DIMENSIONS:384}
         initialize-schema: true
 
   security:
