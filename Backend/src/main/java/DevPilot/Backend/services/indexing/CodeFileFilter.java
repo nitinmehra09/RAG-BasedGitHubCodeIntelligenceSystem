@@ -1,4 +1,4 @@
-package DevPilot.Backend.services.indexing;
+package devPilot.backend.services.indexing;
 
 import java.util.Locale;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package DevPilot.Backend.services.github;
+package devPilot.backend.services.github;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

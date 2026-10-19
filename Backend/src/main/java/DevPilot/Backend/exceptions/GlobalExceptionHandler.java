@@ -1,5 +1,4 @@
-package DevPilot.Backend.exceptions;
-
+package devPilot.backend.exceptions;
 import java.time.Instant;
 import java.util.Map;
 

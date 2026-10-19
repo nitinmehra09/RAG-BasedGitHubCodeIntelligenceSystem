@@ -1,9 +1,9 @@
-package DevPilot.Backend.dto;
+package devPilot.backend.dto;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import DevPilot.Backend.entity.IndexStatus;
+import devPilot.backend.entity.IndexStatus;
 
 public record IndexStatusResponse(
         UUID repositoryId,

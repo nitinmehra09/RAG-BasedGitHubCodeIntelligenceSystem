@@ -1,4 +1,4 @@
-package DevPilot.Backend.controllers;
+package devPilot.backend.controllers;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import DevPilot.Backend.dto.ChatMessageRequest;
-import DevPilot.Backend.dto.ChatMessageResponse;
-import DevPilot.Backend.dto.ChatSessionResponse;
-import DevPilot.Backend.dto.CreateChatSessionRequest;
-import DevPilot.Backend.security.CurrentUser;
-import DevPilot.Backend.services.ChatService;
+import devPilot.backend.dto.ChatMessageRequest;
+import devPilot.backend.dto.ChatMessageResponse;
+import devPilot.backend.dto.ChatSessionResponse;
+import devPilot.backend.dto.CreateChatSessionRequest;
+import devPilot.backend.security.CurrentUser;
+import devPilot.backend.services.ChatService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

@@ -1,8 +1,8 @@
-package DevPilot.Backend.services.ai;
+package devPilot.backend.services.ai;
 
 import java.util.List;
 
-import DevPilot.Backend.dto.CitationDto;
+import devPilot.backend.dto.CitationDto;
 
 public record RetrievedContext(
         List<CitationDto> citations,

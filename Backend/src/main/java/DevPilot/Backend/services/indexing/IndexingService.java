@@ -1,4 +1,4 @@
-package DevPilot.Backend.services.indexing;
+package devPilot.backend.services.indexing;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,15 +13,15 @@ import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 
-import DevPilot.Backend.entity.IndexStatus;
-import DevPilot.Backend.entity.Repository;
-import DevPilot.Backend.exceptions.BadRequestException;
-import DevPilot.Backend.exceptions.NotFoundException;
-import DevPilot.Backend.repos.RepositoryRepository;
-import DevPilot.Backend.services.UserService;
-import DevPilot.Backend.services.ai.RagSettings;
-import DevPilot.Backend.services.github.GitHubRateLimiter;
-import DevPilot.Backend.services.github.GithubApiClient;
+import devPilot.backend.entity.IndexStatus;
+import devPilot.backend.entity.Repository;
+import devPilot.backend.exceptions.BadRequestException;
+import devPilot.backend.exceptions.NotFoundException;
+import devPilot.backend.repository.RepositoryRepository;
+import devPilot.backend.services.UserService;
+import devPilot.backend.services.ai.RagSettings;
+import devPilot.backend.services.github.GitHubRateLimiter;
+import devPilot.backend.services.github.GithubApiClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -187,6 +187,27 @@ public class IndexingService {
             repo.setErrorMessage(message != null && message.length() > 2000
                     ? message.substring(0, 2000)
                     : message);
+            repo.setUpdatedAt(Instant.now());
+            repositoryRepository.save(repo);
+        });
+    }
+
+    /**
+     * Expires a repository: deletes its stored vectors and resets its index status
+     * to EXPIRED. The repo will appear as un-indexed on the dashboard and can be
+     * re-indexed on demand at any time.
+     */
+    @Transactional
+    public void expireRepo(UUID repoId) {
+        repositoryRepository.findById(repoId).ifPresent(repo -> {
+            log.info("Expiring repo {} ({})", repo.getFullName(), repoId);
+            deleteExistingVectors(repoId.toString());
+            repo.setIndexStatus(IndexStatus.EXPIRED);
+            repo.setChunkCount(0);
+            repo.setFilesProcessed(0);
+            repo.setFilesTotal(0);
+            repo.setIndexedAt(null);
+            repo.setErrorMessage(null);
             repo.setUpdatedAt(Instant.now());
             repositoryRepository.save(repo);
         });

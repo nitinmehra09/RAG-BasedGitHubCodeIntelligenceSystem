@@ -1,11 +1,11 @@
-package DevPilot.Backend.dto;
+package devPilot.backend.dto;
 
 import java.time.Instant;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import DevPilot.Backend.entity.IndexStatus;
+import devPilot.backend.entity.IndexStatus;
 
 public record RepositoryResponse(
         UUID id,

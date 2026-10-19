@@ -1,4 +1,4 @@
-package DevPilot.Backend.services.ai;
+package devPilot.backend.services.ai;
 
 import org.springframework.stereotype.Service;
 

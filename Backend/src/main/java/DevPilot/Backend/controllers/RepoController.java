@@ -1,4 +1,4 @@
-package DevPilot.Backend.controllers;
+package devPilot.backend.controllers;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import DevPilot.Backend.dto.IndexStatusResponse;
-import DevPilot.Backend.dto.RepositoryResponse;
-import DevPilot.Backend.entity.Repository;
-import DevPilot.Backend.security.CurrentUser;
-import DevPilot.Backend.services.RepoService;
-import DevPilot.Backend.services.indexing.IndexingService;
+import devPilot.backend.dto.IndexStatusResponse;
+import devPilot.backend.dto.RepositoryResponse;
+import devPilot.backend.entity.Repository;
+import devPilot.backend.security.CurrentUser;
+import devPilot.backend.services.RepoService;
+import devPilot.backend.services.indexing.IndexingService;
 import lombok.RequiredArgsConstructor;
 
 @RestController

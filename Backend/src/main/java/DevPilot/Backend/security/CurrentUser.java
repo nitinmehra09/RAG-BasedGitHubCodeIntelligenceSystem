@@ -1,10 +1,10 @@
-package DevPilot.Backend.security;
+package devPilot.backend.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import DevPilot.Backend.exceptions.UnauthorizedException;
+import devPilot.backend.exceptions.UnauthorizedException;
 
 @Component
 public class CurrentUser {

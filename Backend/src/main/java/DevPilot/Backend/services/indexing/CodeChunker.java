@@ -1,4 +1,4 @@
-package DevPilot.Backend.services.indexing;
+package devPilot.backend.services.indexing;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import DevPilot.Backend.services.ai.RagSettings;
+import devPilot.backend.services.ai.RagSettings;
 
 @Component
 public class CodeChunker {

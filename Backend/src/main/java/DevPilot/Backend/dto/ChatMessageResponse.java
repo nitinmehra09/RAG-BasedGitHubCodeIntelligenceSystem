@@ -1,10 +1,10 @@
-package DevPilot.Backend.dto;
+package devPilot.backend.dto;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import DevPilot.Backend.entity.MessageRole;
+import devPilot.backend.entity.MessageRole;
 
 public record ChatMessageResponse(
         UUID id,

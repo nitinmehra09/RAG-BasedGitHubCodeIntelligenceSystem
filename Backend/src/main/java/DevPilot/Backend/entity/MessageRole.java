@@ -1,4 +1,4 @@
-package DevPilot.Backend.entity;
+package devPilot.backend.entity;
 
 public enum MessageRole {
     USER,

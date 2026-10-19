@@ -1,15 +1,15 @@
-package DevPilot.Backend.services.ai;
+package devPilot.backend.services.ai;
 
 import java.util.List;
 
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
-import DevPilot.Backend.dto.CitationDto;
+import devPilot.backend.dto.CitationDto;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CitationMapper {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     public CitationDto fromDocument(Document document) {
         var meta = document.getMetadata();
@@ -32,8 +32,8 @@ public class CitationMapper {
 
     public String toJson(List<CitationDto> citations) {
         try {
-            return objectMapper.writeValueAsString(citations);
-        } catch (JsonProcessingException e) {
+            return jsonMapper.writeValueAsString(citations);
+        } catch (JacksonException e) {
             return "[]";
         }
     }
@@ -43,8 +43,8 @@ public class CitationMapper {
             return List.of();
         }
         try {
-            return objectMapper.readValue(json, new TypeReference<List<CitationDto>>() {});
-        } catch (JsonProcessingException e) {
+            return jsonMapper.readValue(json, new TypeReference<>() {});
+        } catch (JacksonException e) {
             return List.of();
         }
     }

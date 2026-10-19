@@ -1,4 +1,4 @@
-package DevPilot.Backend.controllers;
+package devPilot.backend.controllers;
 
 import java.util.Map;
 
@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import DevPilot.Backend.dto.UserResponse;
-import DevPilot.Backend.entity.User;
-import DevPilot.Backend.security.AppUserPrincipal;
-import DevPilot.Backend.security.CurrentUser;
+import devPilot.backend.dto.UserResponse;
+import devPilot.backend.entity.User;
+import devPilot.backend.security.AppUserPrincipal;
+import devPilot.backend.security.CurrentUser;
 import lombok.RequiredArgsConstructor;
 
 

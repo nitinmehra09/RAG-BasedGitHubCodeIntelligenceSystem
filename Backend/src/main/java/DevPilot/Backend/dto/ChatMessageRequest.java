@@ -1,4 +1,4 @@
-package DevPilot.Backend.dto;
+package devPilot.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

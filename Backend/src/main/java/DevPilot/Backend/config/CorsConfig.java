@@ -1,4 +1,4 @@
-package DevPilot.Backend.config;
+package devPilot.backend.config;
 
 import java.util.Arrays;
 import java.util.List;

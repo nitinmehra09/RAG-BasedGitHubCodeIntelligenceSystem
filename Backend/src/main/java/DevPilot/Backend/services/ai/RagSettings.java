@@ -1,4 +1,4 @@
-package DevPilot.Backend.services.ai;
+package devPilot.backend.services.ai;
 
 public final class RagSettings {
      /** How many code chunks to fetch from the vector database per question. */

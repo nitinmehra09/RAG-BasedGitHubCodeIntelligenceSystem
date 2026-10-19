@@ -1,4 +1,4 @@
-package DevPilot.Backend.services;
+package devPilot.backend.services;
 
 import java.util.List;
 import java.util.UUID;
@@ -7,22 +7,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import DevPilot.Backend.dto.ChatMessageResponse;
-import DevPilot.Backend.dto.ChatSessionResponse;
-import DevPilot.Backend.dto.CreateChatSessionRequest;
-import DevPilot.Backend.entity.ChatMessage;
-import DevPilot.Backend.entity.ChatSession;
-import DevPilot.Backend.entity.IndexStatus;
-import DevPilot.Backend.entity.MessageRole;
-import DevPilot.Backend.entity.Repository;
-import DevPilot.Backend.exceptions.BadRequestException;
-import DevPilot.Backend.exceptions.NotFoundException;
-import DevPilot.Backend.repos.ChatMessageRepository;
-import DevPilot.Backend.repos.ChatSessionRepository;
-import DevPilot.Backend.services.ai.ChatPromptBuilder;
-import DevPilot.Backend.services.ai.ChatStreamHandler;
-import DevPilot.Backend.services.ai.CitationMapper;
-import DevPilot.Backend.services.ai.CodeContextRetriever;
+import devPilot.backend.dto.ChatMessageResponse;
+import devPilot.backend.dto.ChatSessionResponse;
+import devPilot.backend.dto.CreateChatSessionRequest;
+import devPilot.backend.entity.ChatMessage;
+import devPilot.backend.entity.ChatSession;
+import devPilot.backend.entity.IndexStatus;
+import devPilot.backend.entity.MessageRole;
+import devPilot.backend.entity.Repository;
+import devPilot.backend.exceptions.BadRequestException;
+import devPilot.backend.exceptions.NotFoundException;
+import devPilot.backend.repository.ChatMessageRepository;
+import devPilot.backend.repository.ChatSessionRepository;
+import devPilot.backend.services.ai.ChatPromptBuilder;
+import devPilot.backend.services.ai.ChatStreamHandler;
+import devPilot.backend.services.ai.CitationMapper;
+import devPilot.backend.services.ai.CodeContextRetriever;
 import lombok.RequiredArgsConstructor;
 
 /**

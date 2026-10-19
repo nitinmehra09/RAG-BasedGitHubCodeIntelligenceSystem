@@ -1,4 +1,4 @@
-package DevPilot.Backend.services;
+package devPilot.backend.services;
 
 import java.util.Map;
 import java.util.UUID;
@@ -7,18 +7,18 @@ import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import DevPilot.Backend.entity.User;
-import DevPilot.Backend.repos.UserRepos;
+import devPilot.backend.entity.User;
+import devPilot.backend.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    public final UserRepos userRepository;
+    public final UserRepository userRepository;
     public final TextEncryptor tokenEncryptor;
-
-    @Transactional
+    
+   @Transactional
     public User upsertFromGitHub(Map<String, Object> attributes, String accessToken, String scopes) {
         Long githubId = toLong(attributes.get("id"));
         String login = String.valueOf(attributes.get("login"));
@@ -56,6 +56,6 @@ public class UserService {
         return Long.parseLong(String.valueOf(value));
     }
 
-
+   
 
 }

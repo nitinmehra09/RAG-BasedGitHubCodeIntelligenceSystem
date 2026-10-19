@@ -1,4 +1,4 @@
-package DevPilot.Backend.services.ai;
+package devPilot.backend.services.ai;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,11 +9,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import DevPilot.Backend.dto.ChatMessageResponse;
-import DevPilot.Backend.dto.CitationDto;
-import DevPilot.Backend.entity.ChatMessage;
-import DevPilot.Backend.entity.MessageRole;
-import DevPilot.Backend.repos.ChatMessageRepository;
+import devPilot.backend.dto.ChatMessageResponse;
+import devPilot.backend.dto.CitationDto;
+import devPilot.backend.entity.ChatMessage;
+import devPilot.backend.entity.MessageRole;
+import devPilot.backend.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
