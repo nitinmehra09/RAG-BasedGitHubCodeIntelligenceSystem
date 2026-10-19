@@ -15,9 +15,9 @@ spring:
   application:
     name: backend
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5433/devpilot}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: ${DATABASE_URL:${DB_URL:jdbc:postgresql://localhost:5433/devpilot}}
+    username: ${DB_USERNAME:${PGUSER:${POSTGRES_USER:postgres}}}
+    password: ${DB_PASSWORD:${PGPASSWORD:${POSTGRES_PASSWORD:postgres}}}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
