@@ -48,7 +48,8 @@ spring:
       embedding:
         embeddings-path: ${EMBEDDINGS_PATH:/embeddings}
         options:
-          model: ${AI_EMBEDDING_MODEL:text-embedding-004}
+          model: ${AI_EMBEDDING_MODEL:gemini-embedding-001}
+          dimensions: ${VECTOR_DIMENSIONS:768}
     vectorstore:
       pgvector:
         dimensions: ${VECTOR_DIMENSIONS:768}
