@@ -46,7 +46,7 @@ spring:
         options:
           model: ${AI_CHAT_MODEL:gemini-1.5-flash}
       embedding:
-        base-url: ${EMBEDDING_BASE_URL:http://localhost:8000/v1}
+        base-url: ${EMBEDDING_BASE_URL:https://embedder-production-f633.up.railway.app/v1}
         api-key: ${EMBEDDING_API_KEY:dummy-key}
         embeddings-path: ${EMBEDDINGS_PATH:/embeddings}
         options:
