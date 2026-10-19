@@ -31,16 +31,19 @@ spring:
 
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}
+      base-url: ${AI_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
+      api-key: ${GEMINI_API_KEY:${OPENAI_API_KEY:}}
       chat:
+        completions-path: ${CHAT_COMPLETIONS_PATH:/chat/completions}
         options:
-          model: gpt-4o-mini
+          model: ${AI_CHAT_MODEL:gemini-1.5-flash}
       embedding:
+        embeddings-path: ${EMBEDDINGS_PATH:/embeddings}
         options:
-          model: text-embedding-3-small
+          model: ${AI_EMBEDDING_MODEL:text-embedding-004}
     vectorstore:
       pgvector:
-        dimensions: 1536
+        dimensions: ${VECTOR_DIMENSIONS:768}
         initialize-schema: true
 
   security:
@@ -48,8 +51,8 @@ spring:
       client:
         registration:
           github:
-            client-id: ${GITHUB_CLIENT_ID}
-            client-secret: ${GITHUB_CLIENT_SECRET}
+            client-id: ${GITHUB_CLIENT_ID:}
+            client-secret: ${GITHUB_CLIENT_SECRET:}
             scope:
               - read:user
               - user:email
