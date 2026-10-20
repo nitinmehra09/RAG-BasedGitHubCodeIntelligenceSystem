@@ -38,20 +38,6 @@ spring:
     open-in-view: false
 
   ai:
-    openai:
-      base-url: https://api.groq.com/openai/v1
-      api-key: ${GROQ_API_KEY:}
-      chat:
-        base-url: https://api.groq.com/openai/v1
-        api-key: ${GROQ_API_KEY:}
-        options:
-          model: llama-3.1-8b-instant
-      embedding:
-        base-url: https://embedder-production-f633.up.railway.app
-        api-key: dummy-key
-        options:
-          model: all-MiniLM-L6-v2
-          dimensions: 384
     vectorstore:
       pgvector:
         dimensions: 384
@@ -81,6 +67,10 @@ app:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:3000}
   token-encryptor-password: ${APP_ENCRYPTION_PASSWORD:devpilot_secret_master_key_12345}
   token-encryptor-salt: ${APP_ENCRYPTION_SALT:5c0744940b5c369b}
+  groq:
+    api-key: ${GROQ_API_KEY:}
+  embedder:
+    base-url: ${EMBEDDER_URL:https://embedder-production-f633.up.railway.app}
   indexing:
     max-file-bytes: 102400
     chunk-size: 800

@@ -4,21 +4,26 @@ import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.openai.http.okhttp.OpenAiHttpClientBuilderCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestClient;
 
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okio.Buffer;
-import java.io.IOException;
+import com.openai.client.OpenAIClient;
+import com.openai.client.OpenAIClientAsync;
+import com.openai.client.OpenAIClientAsyncImpl;
+import com.openai.client.OpenAIClientImpl;
+import com.openai.core.ClientOptions;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 
 @Configuration
 @EnableAsync
@@ -43,41 +48,63 @@ public class AppConfig {
         return executor;
     }
 
+    /**
+     * Dedicated Groq ChatModel using Groq's blazing-fast OpenAI-compatible API.
+     * Uses model llama-3.1-8b-instant.
+     */
     @Bean
-    OpenAiHttpClientBuilderCustomizer openAiHttpClientCustomizer() {
-        return builder -> builder.interceptor(chain -> {
-            Request request = chain.request();
-            String authHeader = request.header("Authorization");
-            String apiKey = (authHeader != null && authHeader.startsWith("Bearer "))
-                    ? authHeader.substring(7).trim() : "";
+    @Primary
+    public ChatModel chatModel(@Value("${app.groq.api-key:${GROQ_API_KEY:}}") String groqApiKey) {
+        String key = (groqApiKey != null) ? groqApiKey.trim() : "";
+        log.info("Configuring Groq ChatModel (llama-3.1-8b-instant). Key length: {}", key.length());
 
-            HttpUrl groqUrl = HttpUrl.parse("https://api.groq.com/openai/v1/chat/completions");
-            Request.Builder reqBuilder = request.newBuilder().url(groqUrl);
+        ClientOptions clientOptions = ClientOptions.builder()
+                .baseUrl("https://api.groq.com/openai/v1")
+                .apiKey(key)
+                .build();
 
-            // Ensure model is set to llama-3.1-8b-instant
-            RequestBody body = request.body();
-            if (body != null) {
-                try {
-                    Buffer buffer = new Buffer();
-                    body.writeTo(buffer);
-                    String bodyStr = buffer.readUtf8();
-                    if (!bodyStr.contains("\"llama-3.1-8b-instant\"")) {
-                        String updatedBody = bodyStr.replaceAll("\"model\"\\s*:\\s*\"[^\"]+\"", "\"model\":\"llama-3.1-8b-instant\"");
-                        MediaType contentType = body.contentType();
-                        reqBuilder.method(request.method(), RequestBody.create(updatedBody, contentType));
-                    }
-                } catch (IOException e) {
-                    log.warn("Failed to rewrite model in request body: {}", e.getMessage());
-                }
-            }
+        OpenAIClient syncClient = new OpenAIClientImpl(clientOptions);
+        OpenAIClientAsync asyncClient = new OpenAIClientAsyncImpl(clientOptions);
 
-            Request finalRequest = reqBuilder.build();
-            log.info("AI HTTP Request [Groq]: {} {}", finalRequest.method(), finalRequest.url());
-            Response response = chain.proceed(finalRequest);
-            log.info("AI HTTP Response [Groq]: status={} for {}", response.code(), finalRequest.url());
-            return response;
-        });
+        OpenAiChatOptions options = OpenAiChatOptions.builder()
+                .model("llama-3.1-8b-instant")
+                .build();
+
+        return OpenAiChatModel.builder()
+                .openAiClient(syncClient)
+                .openAiClientAsync(asyncClient)
+                .options(options)
+                .build();
+    }
+
+    /**
+     * Dedicated Python Embedder EmbeddingModel targeting the external Python FastAPI service.
+     * Generates 384-dimensional embeddings using all-MiniLM-L6-v2.
+     */
+    @Bean
+    @Primary
+    public EmbeddingModel embeddingModel(
+            @Value("${app.embedder.base-url:${EMBEDDER_URL:https://embedder-production-f633.up.railway.app}}") String embedderUrl) {
+        String url = (embedderUrl != null && !embedderUrl.isBlank())
+                ? embedderUrl.trim()
+                : "https://embedder-production-f633.up.railway.app";
+        log.info("Configuring Python EmbeddingModel (all-MiniLM-L6-v2, 384 dims) targeting: {}", url);
+
+        ClientOptions clientOptions = ClientOptions.builder()
+                .baseUrl(url)
+                .apiKey("dummy-key")
+                .build();
+
+        OpenAIClient syncClient = new OpenAIClientImpl(clientOptions);
+
+        OpenAiEmbeddingOptions options = OpenAiEmbeddingOptions.builder()
+                .model("all-MiniLM-L6-v2")
+                .dimensions(384)
+                .build();
+
+        return OpenAiEmbeddingModel.builder()
+                .openAiClient(syncClient)
+                .options(options)
+                .build();
     }
 }
-
-
