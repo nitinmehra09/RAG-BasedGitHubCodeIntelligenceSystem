@@ -39,11 +39,11 @@ spring:
 
   ai:
     openai:
-      base-url: ${AI_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
-      api-key: ${GEMINI_API_KEY:${OPENAI_API_KEY:}}
+      base-url: ${AI_BASE_URL:https://api.groq.com/openai/v1}
+      api-key: ${GROQ_API_KEY:${OPENAI_API_KEY:${GEMINI_API_KEY:}}}
       chat:
         options:
-          model: ${AI_CHAT_MODEL:gemini-1.5-flash}
+          model: ${AI_CHAT_MODEL:llama-3.3-70b-versatile}
       embedding:
         base-url: ${EMBEDDING_BASE_URL:https://embedder-production-f633.up.railway.app}
         api-key: ${EMBEDDING_API_KEY:dummy-key}
