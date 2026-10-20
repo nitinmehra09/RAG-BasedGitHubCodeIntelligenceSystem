@@ -13,8 +13,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestClient;
 
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Buffer;
+import java.io.IOException;
 
 @Configuration
 @EnableAsync
@@ -43,28 +47,58 @@ public class AppConfig {
     OpenAiHttpClientBuilderCustomizer openAiHttpClientCustomizer() {
         return builder -> builder.interceptor(chain -> {
             Request request = chain.request();
-            HttpUrl url = request.url();
+            String authHeader = request.header("Authorization");
+            String apiKey = (authHeader != null && authHeader.startsWith("Bearer "))
+                    ? authHeader.substring(7).trim() : "";
 
-            // Guard against any Gemini URL missing /v1beta/openai prefix
-            if ("generativelanguage.googleapis.com".equalsIgnoreCase(url.host())) {
-                String path = url.encodedPath();
-                if (!path.startsWith("/v1beta/openai")) {
-                    HttpUrl rewrittenUrl = url.newBuilder()
-                            .encodedPath("/v1beta/openai/chat/completions")
-                            .build();
-                    log.info("Rewrote Gemini URL from {} to {}", url, rewrittenUrl);
-                    request = request.newBuilder().url(rewrittenUrl).build();
+            HttpUrl currentUrl = request.url();
+            HttpUrl targetUrl = currentUrl;
+            String targetModel = null;
+            String provider = "Custom";
+
+            if (apiKey.startsWith("gsk_")) {
+                provider = "Groq";
+                targetUrl = HttpUrl.parse("https://api.groq.com/openai/v1/chat/completions");
+                targetModel = "llama-3.1-8b-instant";
+            } else if (apiKey.startsWith("AIza")) {
+                provider = "Gemini";
+                targetUrl = HttpUrl.parse("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
+                targetModel = "gemini-1.5-flash";
+            } else if (apiKey.startsWith("sk-")) {
+                provider = "OpenAI";
+                targetUrl = HttpUrl.parse("https://api.openai.com/v1/chat/completions");
+                targetModel = "gpt-4o-mini";
+            }
+
+            Request.Builder reqBuilder = request.newBuilder();
+            if (targetUrl != null) {
+                reqBuilder.url(targetUrl);
+            }
+
+            // Ensure request body model matches the provider
+            RequestBody body = request.body();
+            if (body != null && targetModel != null) {
+                try {
+                    Buffer buffer = new Buffer();
+                    body.writeTo(buffer);
+                    String bodyStr = buffer.readUtf8();
+                    if (!bodyStr.contains("\"" + targetModel + "\"")) {
+                        String updatedBody = bodyStr.replaceAll("\"model\"\\s*:\\s*\"[^\"]+\"", "\"model\":\"" + targetModel + "\"");
+                        MediaType contentType = body.contentType();
+                        reqBuilder.method(request.method(), RequestBody.create(updatedBody, contentType));
+                    }
+                } catch (IOException e) {
+                    log.warn("Failed to rewrite model in request body: {}", e.getMessage());
                 }
             }
 
-
-            log.info("AI HTTP request: {} {}", request.method(), request.url());
-            Response response = chain.proceed(request);
-            if (!response.isSuccessful()) {
-                log.warn("AI HTTP response returned code {}: {}", response.code(), request.url());
-            }
+            Request finalRequest = reqBuilder.build();
+            log.info("Smart AI Routing [{}]: {} {}", provider, finalRequest.method(), finalRequest.url());
+            Response response = chain.proceed(finalRequest);
+            log.info("AI HTTP response: status={} for {}", response.code(), finalRequest.url());
             return response;
         });
     }
 }
+
 
