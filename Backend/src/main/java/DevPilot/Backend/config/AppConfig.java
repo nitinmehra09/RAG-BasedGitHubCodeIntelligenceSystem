@@ -32,6 +32,9 @@ public class AppConfig implements org.springframework.beans.factory.Initializing
     @Value("${GROQ_API_KEY:${app.groq.api-key:}}")
     private String groqApiKey;
 
+    @Value("${GROQ_CHAT_MODEL:${spring.ai.openai.chat.options.model:openai/gpt-oss-120b}}")
+    private String chatModel;
+
     @Override
     public void afterPropertiesSet() {
         String key = (groqApiKey != null && !groqApiKey.isBlank()) ? groqApiKey.trim() : System.getenv("GROQ_API_KEY");
@@ -86,14 +89,19 @@ public class AppConfig implements org.springframework.beans.factory.Initializing
                     log.error("GROQ_API_KEY is NOT set in environment variables! Outgoing chat request has no Groq key!");
                 }
 
-                // Ensure model is llama-3.1-8b-instant
+                // Ensure model is set to configured chat model
+                String targetModel = (chatModel != null && !chatModel.isBlank()) ? chatModel.trim() : "openai/gpt-oss-120b";
                 RequestBody body = request.body();
                 if (body != null) {
                     try {
                         Buffer buffer = new Buffer();
                         body.writeTo(buffer);
                         String bodyStr = buffer.readUtf8();
-                        String updatedBody = bodyStr.replaceAll("\"model\"\\s*:\\s*\"[^\"]+\"", "\"model\":\"llama-3.1-8b-instant\"");
+                        String updatedBody = bodyStr.replaceAll("\"model\"\\s*:\\s*\"[^\"]+\"",
+                                "\"model\":\"" + java.util.regex.Matcher.quoteReplacement(targetModel) + "\"");
+                        if (!updatedBody.contains("\"model\"")) {
+                            updatedBody = updatedBody.replaceFirst("\\{", "{\"model\":\"" + java.util.regex.Matcher.quoteReplacement(targetModel) + "\",");
+                        }
                         MediaType contentType = body.contentType();
                         reqBuilder.method(request.method(), RequestBody.create(updatedBody, contentType));
                     } catch (IOException e) {
@@ -105,7 +113,7 @@ public class AppConfig implements org.springframework.beans.factory.Initializing
                 String authHeader = finalRequest.header("Authorization");
                 String maskedKey = (authHeader != null && authHeader.length() > 14)
                         ? authHeader.substring(0, 14) + "..." : authHeader;
-                log.info("Dispatching Chat to Groq: {} {} (Auth: {})", finalRequest.method(), finalRequest.url(), maskedKey);
+                log.info("Dispatching Chat to Groq: model={} url={} (Auth: {})", targetModel, finalRequest.url(), maskedKey);
 
                 Response response = chain.proceed(finalRequest);
                 if (!response.isSuccessful()) {

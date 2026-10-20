@@ -56,7 +56,9 @@ export function useIndexStatus(repoId: string, enabled = false) {
     queryFn: () => api.indexStatus(repoId),
     enabled: Boolean(repoId) && enabled,
     refetchInterval: (query) =>
-      query.state.data?.indexStatus === "INDEXING" ? 1500 : false,
+      !query.state.data || query.state.data?.indexStatus === "INDEXING"
+        ? 1500
+        : false,
   });
 }
 
@@ -70,6 +72,12 @@ export function useStartIndexing() {
       updateRepoInListCache(queryClient, repo);
       void queryClient.invalidateQueries({
         queryKey: queryKeys.repos.status(repo.id),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.repos.detail(repo.id),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.repos.list(),
       });
       toast.add({
         title: "Indexing started",

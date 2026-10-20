@@ -26,6 +26,9 @@ public class DebugController {
     @Value("${OPENAI_API_KEY:}")
     private String openAiApiKey;
 
+    @Value("${GROQ_CHAT_MODEL:${spring.ai.openai.chat.options.model:openai/gpt-oss-120b}}")
+    private String configuredChatModel;
+
     public DebugController(ChatModel chatModel, EmbeddingModel embeddingModel) {
         this.chatModel = chatModel;
         this.embeddingModel = embeddingModel;
@@ -39,6 +42,7 @@ public class DebugController {
         map.put("groqApiKeyConfigured", gKey != null && !gKey.isBlank());
         map.put("groqApiKeyPrefix", (gKey != null && gKey.length() > 6) ? gKey.substring(0, 7) : "none");
         map.put("openaiApiKeyConfigured", openAiApiKey != null && !openAiApiKey.isBlank());
+        map.put("configuredChatModel", configuredChatModel);
 
         // 1. Test embedding with python embedder
         try {
@@ -50,23 +54,30 @@ public class DebugController {
             map.put("embeddingError", e.getClass().getName() + ": " + e.getMessage());
         }
 
-        // 2. Query Groq /openai/v1/models to see what models this key actually has access to
-        List<String> availableGroqModels = new ArrayList<>();
-        try {
+        // 2. Direct HTTP chat completions test for candidate models
+        Map<String, Object> candidateTests = new HashMap<>();
+        if (gKey != null && !gKey.isBlank()) {
+            String[] candidates = new String[] { "openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b" };
             java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
-            java.net.http.HttpRequest req = java.net.http.HttpRequest.newBuilder()
-                    .uri(java.net.URI.create("https://api.groq.com/openai/v1/models"))
-                    .header("Authorization", "Bearer " + gKey)
-                    .GET()
-                    .build();
-            java.net.http.HttpResponse<String> resp = client.send(req, java.net.http.HttpResponse.BodyHandlers.ofString());
-            map.put("groqModelsHttpStatus", resp.statusCode());
-            map.put("groqModelsRaw", resp.body());
-        } catch (Exception e) {
-            map.put("groqModelsError", e.getMessage());
+            for (String modelName : candidates) {
+                try {
+                    String payload = "{\"model\":\"" + modelName + "\",\"messages\":[{\"role\":\"user\",\"content\":\"Hi\"}],\"max_tokens\":10}";
+                    java.net.http.HttpRequest req = java.net.http.HttpRequest.newBuilder()
+                            .uri(java.net.URI.create("https://api.groq.com/openai/v1/chat/completions"))
+                            .header("Authorization", "Bearer " + gKey)
+                            .header("Content-Type", "application/json")
+                            .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload))
+                            .build();
+                    java.net.http.HttpResponse<String> resp = client.send(req, java.net.http.HttpResponse.BodyHandlers.ofString());
+                    candidateTests.put(modelName, Map.of("status", resp.statusCode(), "body", resp.body()));
+                } catch (Exception e) {
+                    candidateTests.put(modelName, Map.of("error", e.getMessage()));
+                }
+            }
         }
+        map.put("candidateTests", candidateTests);
 
-        // 3. Test chat completion with Groq
+        // 3. Test chat completion with configured ChatModel bean
         try {
             String reply = chatModel.call("Say hello in one word");
             map.put("chatSuccess", true);

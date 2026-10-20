@@ -100,15 +100,16 @@ public class IndexingService {
                 List<Document> chunks = codeChunker.chunkFile(repoId.toString(), path, content);
                 batch.addAll(chunks);
                 totalChunks += chunks.size();
-                if (batch.size() >= VECTOR_BATCH_SIZE) {
-                    try {
-                        vectorStore.add(batch);
-                    } finally {
-                        batch.clear();
-                    }
-                }
             } catch (Exception ex) {
                 log.warn("Skipping file {} in {}: {}", path, repo.getFullName(), ex.getMessage());
+            }
+
+            if (batch.size() >= VECTOR_BATCH_SIZE) {
+                try {
+                    vectorStore.add(batch);
+                } finally {
+                    batch.clear();
+                }
             }
 
             processed++;

@@ -45,7 +45,7 @@ spring:
         base-url: https://api.groq.com/openai/v1
         api-key: ${GROQ_API_KEY:}
         options:
-          model: llama-3.1-8b-instant
+          model: ${GROQ_CHAT_MODEL:openai/gpt-oss-120b}
       embedding:
         base-url: https://embedder-production-f633.up.railway.app
         api-key: dummy-key
