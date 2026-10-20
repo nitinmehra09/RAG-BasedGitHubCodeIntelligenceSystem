@@ -38,6 +38,20 @@ spring:
     open-in-view: false
 
   ai:
+    openai:
+      base-url: https://api.groq.com/openai/v1
+      api-key: ${GROQ_API_KEY:}
+      chat:
+        base-url: https://api.groq.com/openai/v1
+        api-key: ${GROQ_API_KEY:}
+        options:
+          model: llama-3.1-8b-instant
+      embedding:
+        base-url: https://embedder-production-f633.up.railway.app
+        api-key: dummy-key
+        options:
+          model: all-MiniLM-L6-v2
+          dimensions: 384
     vectorstore:
       pgvector:
         dimensions: 384
