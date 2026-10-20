@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -48,7 +50,23 @@ public class DebugController {
             map.put("embeddingError", e.getClass().getName() + ": " + e.getMessage());
         }
 
-        // 2. Test chat completion with Groq
+        // 2. Query Groq /openai/v1/models to see what models this key actually has access to
+        List<String> availableGroqModels = new ArrayList<>();
+        try {
+            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+            java.net.http.HttpRequest req = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create("https://api.groq.com/openai/v1/models"))
+                    .header("Authorization", "Bearer " + gKey)
+                    .GET()
+                    .build();
+            java.net.http.HttpResponse<String> resp = client.send(req, java.net.http.HttpResponse.BodyHandlers.ofString());
+            map.put("groqModelsHttpStatus", resp.statusCode());
+            map.put("groqModelsRaw", resp.body());
+        } catch (Exception e) {
+            map.put("groqModelsError", e.getMessage());
+        }
+
+        // 3. Test chat completion with Groq
         try {
             String reply = chatModel.call("Say hello in one word");
             map.put("chatSuccess", true);
