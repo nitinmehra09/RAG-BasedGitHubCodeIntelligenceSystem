@@ -43,7 +43,7 @@ spring:
       api-key: ${GROQ_API_KEY:${OPENAI_API_KEY:${GEMINI_API_KEY:}}}
       chat:
         options:
-          model: ${AI_CHAT_MODEL:llama-3.3-70b-versatile}
+          model: ${AI_CHAT_MODEL:llama-3.1-8b-instant}
       embedding:
         base-url: ${EMBEDDING_BASE_URL:https://embedder-production-f633.up.railway.app}
         api-key: ${EMBEDDING_API_KEY:dummy-key}
