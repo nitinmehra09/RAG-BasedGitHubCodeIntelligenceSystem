@@ -23,5 +23,7 @@ public interface RepositoryRepository extends JpaRepository<Repository, UUID> {
     List<Repository> findByIndexStatusAndIndexedAtBefore(
             @Param("status") IndexStatus status,
             @Param("cutoff") Instant cutoff);
+
+    List<Repository> findByIndexStatus(IndexStatus status);
 }
 

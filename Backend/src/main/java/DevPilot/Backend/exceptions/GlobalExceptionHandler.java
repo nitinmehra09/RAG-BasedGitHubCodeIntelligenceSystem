@@ -42,6 +42,11 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, message);
     }
 
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotWritableException.class)
+    public void handleNotWritable(org.springframework.http.converter.HttpMessageNotWritableException ex) {
+        log.warn("Cannot write HTTP response body (stream closed or incompatible content type): {}", ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
         log.error("Unhandled exception caught in GlobalExceptionHandler", ex);

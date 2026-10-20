@@ -104,6 +104,16 @@ export function useStreamChat(sessionId: string | null) {
           },
           onError: (err) => {
             console.error("Stream SSE error:", err);
+            toast.add({
+              title: "AI Response Error",
+              description: err.message,
+              type: "error",
+            });
+            queryClient.setQueryData<ChatMessage[]>(
+              queryKeys.chat.messages(sessionId),
+              (prev) => (prev ?? []).filter((m) => m.id !== optimisticId)
+            );
+            setStreamText("");
           },
         });
       } catch (err) {

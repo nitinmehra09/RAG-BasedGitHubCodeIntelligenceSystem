@@ -41,6 +41,8 @@ public class IndexingService {
     private final GitHubRateLimiter rateLimiter;
     private final VectorStore vectorStore;
 
+    private final java.util.Set<UUID> activeIndexingJobs = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
     @Value("${app.indexing.max-file-bytes:102400}")
     private long maxFileBytes;
 
@@ -48,8 +50,8 @@ public class IndexingService {
         Repository repo = repositoryRepository.findByIdAndUserId(repoId, userId)
                 .orElseThrow(() -> new NotFoundException("Repository not found"));
 
-        if (repo.getIndexStatus() == IndexStatus.INDEXING) {
-            throw new BadRequestException("Repository is already being indexed");
+        if (activeIndexingJobs.contains(repoId)) {
+            throw new BadRequestException("Repository is already being indexed by an active worker");
         }
 
         repo.setIndexStatus(IndexStatus.INDEXING);
@@ -62,17 +64,19 @@ public class IndexingService {
     }
 
     @Async("indexingExecutor")
-     public void indexAsync(UUID repoId, UUID userId) {
+    public void indexAsync(UUID repoId, UUID userId) {
+        activeIndexingJobs.add(repoId);
         try {
             doIndex(repoId, userId);
         } catch (Exception ex) {
             log.error("Indexing failed for repo {}", repoId, ex);
             markFailed(repoId, ex.getMessage());
+        } finally {
+            activeIndexingJobs.remove(repoId);
         }
     }
 
-
-      private void doIndex(UUID repoId, UUID userId) {
+    private void doIndex(UUID repoId, UUID userId) {
         Repository repo = repositoryRepository.findById(repoId)
                 .orElseThrow(() -> new NotFoundException("Repository not found"));
         String token = userService.decryptAccessToken(userService.requiredById(userId));
@@ -97,8 +101,11 @@ public class IndexingService {
                 batch.addAll(chunks);
                 totalChunks += chunks.size();
                 if (batch.size() >= VECTOR_BATCH_SIZE) {
-                    vectorStore.add(batch);
-                    batch.clear();
+                    try {
+                        vectorStore.add(batch);
+                    } finally {
+                        batch.clear();
+                    }
                 }
             } catch (Exception ex) {
                 log.warn("Skipping file {} in {}: {}", path, repo.getFullName(), ex.getMessage());
@@ -110,7 +117,11 @@ public class IndexingService {
         }
 
         if (!batch.isEmpty()) {
-            vectorStore.add(batch);
+            try {
+                vectorStore.add(batch);
+            } finally {
+                batch.clear();
+            }
         }
 
         markReady(repoId, filePaths.size(), processed, totalChunks, repo.getFullName());

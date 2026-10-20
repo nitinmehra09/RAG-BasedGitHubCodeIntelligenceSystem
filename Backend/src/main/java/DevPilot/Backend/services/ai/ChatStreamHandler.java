@@ -53,17 +53,29 @@ public class ChatStreamHandler {
                     .content()
                     .doOnNext(token -> appendToken(emitter, fullReply, token))
                     .doOnError(err -> {
-                        log.error("Chat stream error", err);
+                        log.error("Chat stream error for session {}: {}", sessionId, err.getMessage());
                         try {
-                            emitter.send(SseEmitter.event().name("error").data(err.getMessage() != null ? err.getMessage() : "Error streaming response"));
-                        } catch (Exception ignored) {}
-                        emitter.completeWithError(err);
+                            emitter.send(SseEmitter.event()
+                                    .name("error")
+                                    .data(err.getMessage() != null ? err.getMessage() : "Error streaming response"));
+                        } catch (Exception ignored) {
+                        } finally {
+                            emitter.complete();
+                        }
                     })
                     .doOnComplete(() -> completeStream(
                             emitter, sessionId, fullReply, citations))
                     .subscribe();
         } catch (Exception ex) {
-            emitter.completeWithError(ex);
+            log.error("Failed to start chat stream for session {}: {}", sessionId, ex.getMessage());
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("error")
+                        .data(ex.getMessage() != null ? ex.getMessage() : "Failed to start streaming"));
+            } catch (Exception ignored) {
+            } finally {
+                emitter.complete();
+            }
         }
 
         return emitter;
