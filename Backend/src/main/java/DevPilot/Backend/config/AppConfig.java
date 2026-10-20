@@ -24,6 +24,7 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
+import org.springframework.ai.openai.http.okhttp.SpringAiOpenAiHttpClient;
 
 @Configuration
 @EnableAsync
@@ -61,6 +62,7 @@ public class AppConfig {
         ClientOptions clientOptions = ClientOptions.builder()
                 .baseUrl("https://api.groq.com/openai/v1")
                 .apiKey(key)
+                .httpClient(SpringAiOpenAiHttpClient.builder().build())
                 .build();
 
         OpenAIClient syncClient = new OpenAIClientImpl(clientOptions);
@@ -93,6 +95,7 @@ public class AppConfig {
         ClientOptions clientOptions = ClientOptions.builder()
                 .baseUrl(url)
                 .apiKey("dummy-key")
+                .httpClient(SpringAiOpenAiHttpClient.builder().build())
                 .build();
 
         OpenAIClient syncClient = new OpenAIClientImpl(clientOptions);
