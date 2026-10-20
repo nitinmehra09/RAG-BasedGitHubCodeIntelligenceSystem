@@ -51,39 +51,18 @@ public class AppConfig {
             String apiKey = (authHeader != null && authHeader.startsWith("Bearer "))
                     ? authHeader.substring(7).trim() : "";
 
-            HttpUrl currentUrl = request.url();
-            HttpUrl targetUrl = currentUrl;
-            String targetModel = null;
-            String provider = "Custom";
+            HttpUrl groqUrl = HttpUrl.parse("https://api.groq.com/openai/v1/chat/completions");
+            Request.Builder reqBuilder = request.newBuilder().url(groqUrl);
 
-            if (apiKey.startsWith("gsk_")) {
-                provider = "Groq";
-                targetUrl = HttpUrl.parse("https://api.groq.com/openai/v1/chat/completions");
-                targetModel = "llama-3.1-8b-instant";
-            } else if (apiKey.startsWith("AIza")) {
-                provider = "Gemini";
-                targetUrl = HttpUrl.parse("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
-                targetModel = "gemini-1.5-flash";
-            } else if (apiKey.startsWith("sk-")) {
-                provider = "OpenAI";
-                targetUrl = HttpUrl.parse("https://api.openai.com/v1/chat/completions");
-                targetModel = "gpt-4o-mini";
-            }
-
-            Request.Builder reqBuilder = request.newBuilder();
-            if (targetUrl != null) {
-                reqBuilder.url(targetUrl);
-            }
-
-            // Ensure request body model matches the provider
+            // Ensure model is set to llama-3.1-8b-instant
             RequestBody body = request.body();
-            if (body != null && targetModel != null) {
+            if (body != null) {
                 try {
                     Buffer buffer = new Buffer();
                     body.writeTo(buffer);
                     String bodyStr = buffer.readUtf8();
-                    if (!bodyStr.contains("\"" + targetModel + "\"")) {
-                        String updatedBody = bodyStr.replaceAll("\"model\"\\s*:\\s*\"[^\"]+\"", "\"model\":\"" + targetModel + "\"");
+                    if (!bodyStr.contains("\"llama-3.1-8b-instant\"")) {
+                        String updatedBody = bodyStr.replaceAll("\"model\"\\s*:\\s*\"[^\"]+\"", "\"model\":\"llama-3.1-8b-instant\"");
                         MediaType contentType = body.contentType();
                         reqBuilder.method(request.method(), RequestBody.create(updatedBody, contentType));
                     }
@@ -93,9 +72,9 @@ public class AppConfig {
             }
 
             Request finalRequest = reqBuilder.build();
-            log.info("Smart AI Routing [{}]: {} {}", provider, finalRequest.method(), finalRequest.url());
+            log.info("AI HTTP Request [Groq]: {} {}", finalRequest.method(), finalRequest.url());
             Response response = chain.proceed(finalRequest);
-            log.info("AI HTTP response: status={} for {}", response.code(), finalRequest.url());
+            log.info("AI HTTP Response [Groq]: status={} for {}", response.code(), finalRequest.url());
             return response;
         });
     }

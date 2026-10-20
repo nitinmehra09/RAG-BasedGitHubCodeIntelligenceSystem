@@ -39,22 +39,22 @@ spring:
 
   ai:
     openai:
-      base-url: ${AI_BASE_URL:https://api.groq.com/openai/v1}
-      api-key: ${GROQ_API_KEY:${OPENAI_API_KEY:${GEMINI_API_KEY:}}}
+      base-url: https://api.groq.com/openai/v1
+      api-key: ${GROQ_API_KEY:}
       chat:
-        base-url: ${AI_BASE_URL:https://api.groq.com/openai/v1}
-        api-key: ${GROQ_API_KEY:${OPENAI_API_KEY:${GEMINI_API_KEY:}}}
+        base-url: https://api.groq.com/openai/v1
+        api-key: ${GROQ_API_KEY:}
         options:
-          model: ${AI_CHAT_MODEL:llama-3.1-8b-instant}
+          model: llama-3.1-8b-instant
       embedding:
-        base-url: ${EMBEDDING_BASE_URL:https://embedder-production-f633.up.railway.app}
-        api-key: ${EMBEDDING_API_KEY:dummy-key}
+        base-url: https://embedder-production-f633.up.railway.app
+        api-key: dummy-key
         options:
-          model: ${AI_EMBEDDING_MODEL:all-MiniLM-L6-v2}
-          dimensions: ${VECTOR_DIMENSIONS:384}
+          model: all-MiniLM-L6-v2
+          dimensions: 384
     vectorstore:
       pgvector:
-        dimensions: ${VECTOR_DIMENSIONS:384}
+        dimensions: 384
         initialize-schema: true
 
   security:
