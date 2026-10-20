@@ -45,17 +45,18 @@ public class AppConfig {
             Request request = chain.request();
             HttpUrl url = request.url();
 
-            // Guard against Gemini URL missing /v1beta/openai prefix
+            // Guard against any Gemini URL missing /v1beta/openai prefix
             if ("generativelanguage.googleapis.com".equalsIgnoreCase(url.host())) {
                 String path = url.encodedPath();
-                if (path.startsWith("/chat/completions")) {
+                if (!path.startsWith("/v1beta/openai")) {
                     HttpUrl rewrittenUrl = url.newBuilder()
-                            .encodedPath("/v1beta/openai" + path)
+                            .encodedPath("/v1beta/openai/chat/completions")
                             .build();
-                    log.info("Rewrote Gemini chat completion URL from {} to {}", url, rewrittenUrl);
+                    log.info("Rewrote Gemini URL from {} to {}", url, rewrittenUrl);
                     request = request.newBuilder().url(rewrittenUrl).build();
                 }
             }
+
 
             log.info("AI HTTP request: {} {}", request.method(), request.url());
             Response response = chain.proceed(request);
