@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/actuator/**",
+                                "/api/debug/**",
                                 "/api/auth/login-url",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
