@@ -82,6 +82,12 @@ public class ChatService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public ChatSession requireSession(UUID userId, UUID sessionId) {
+        return chatSessionRepository.findByIdAndUserId(sessionId, userId)
+                .orElseThrow(() -> new NotFoundException("Chat session not found"));
+    }
+
     @Transactional
     public void deleteSession(UUID userId, UUID sessionId) {
         ChatSession session = requireSession(userId, sessionId);
