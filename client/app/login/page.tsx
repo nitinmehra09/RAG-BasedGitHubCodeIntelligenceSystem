@@ -62,9 +62,9 @@ const LoginContent = () => {
               <GitHubIcon className="size-6" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="text-xl">Sign in</CardTitle>
+              <CardTitle className="text-xl">Welcome to GitSense</CardTitle>
               <CardDescription>
-                Connect GitHub to chat with your repositories.
+                Connect GitHub to chat with any codebase.
               </CardDescription>
             </div>
           </CardHeader>

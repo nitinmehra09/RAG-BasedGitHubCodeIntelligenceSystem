@@ -33,7 +33,7 @@ function StatCard({
   icon: typeof FolderGit2;
 }) {
   return (
-    <Card size="sm">
+    <Card size="sm" className="animate-fade-up">
       <CardHeader className="pb-0">
         <div className="flex items-start justify-between gap-3">
           <div>

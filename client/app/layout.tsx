@@ -1,25 +1,25 @@
 import type { Metadata } from "next";
-import { Poppins, Roboto } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import QueryProvider from "@/components/providers/query-provider";
 import { Toaster } from "@/components/ui/toast";
 
-const poppinsHeading = Poppins({
-  subsets: ["latin"],
-  variable: "--font-heading",
-  weight: ["400", "500", "600", "700"],
-});
-
-const robotoSans = Roboto({
+const interSans = Inter({
   subsets: ["latin"],
   variable: "--font-geist-sans",
-  weight: ["400", "500", "700"],
+  weight: ["300", "400", "500", "600"],
+});
+
+const outfitHeading = Outfit({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
-  title: "DevPilot - AI GitHub Code Intelligence",
+  title: "GitSense - AI GitHub Code Intelligence",
   description: "Chat with your GitHub repository using RAG and AI code intelligence",
 };
 
@@ -34,8 +34,8 @@ export default function RootLayout({
       className={cn(
         "h-full",
         "antialiased",
-        robotoSans.variable,
-        poppinsHeading.variable,
+        interSans.variable,
+        outfitHeading.variable,
       )}
       suppressHydrationWarning
     >

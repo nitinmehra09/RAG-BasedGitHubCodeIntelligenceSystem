@@ -48,7 +48,7 @@ export function RepoCard({ repo }: { repo: Repository }) {
   return (
     <article
       className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border border-dashed bg-card/80 shadow-md shadow-foreground/5 transition-all",
+        "group animate-fade-up flex flex-col overflow-hidden rounded-2xl border border-dashed bg-card/80 shadow-md shadow-foreground/5 transition-all",
         isFailed
           ? "border-destructive/30 bg-destructive/2 hover:border-destructive/40"
           : isExpired
