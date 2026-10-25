@@ -42,20 +42,20 @@ export function ChatMessages({
   if (isLoading) {
     return (
       <div className="flex flex-1 flex-col gap-4 p-6">
-        <Skeleton className="h-16 w-2/3 rounded-3xl" />
-        <Skeleton className="ml-auto h-12 w-1/2 rounded-3xl" />
-        <Skeleton className="h-24 w-3/4 rounded-3xl" />
+        <Skeleton className="h-16 w-2/3 rounded-3xl dark:bg-white/[0.05]" />
+        <Skeleton className="ml-auto h-12 w-1/2 rounded-3xl dark:bg-white/[0.05]" />
+        <Skeleton className="h-24 w-3/4 rounded-3xl dark:bg-white/[0.05]" />
       </div>
     );
   }
 
   return (
     <ScrollArea className="flex-1">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6">
         {messages.length === 0 && !streamText && !streaming && (
-          <div className="rounded-2xl border border-dashed bg-muted/30 px-6 py-10 text-center">
-            <p className="font-medium">Ask anything about this codebase</p>
-            <p className="mt-1 text-sm text-muted-foreground">
+          <div className="rounded-2xl border border-border/80 bg-card/60 px-6 py-12 text-center backdrop-blur-md dark:border-white/[0.08] dark:bg-[#10121a]/70">
+            <p className="font-semibold text-foreground">Ask anything about this codebase</p>
+            <p className="mt-1.5 text-sm text-muted-foreground">
               Try “Where is authentication handled?” or “Explain the repository
               indexing flow.”
             </p>
@@ -72,8 +72,8 @@ export function ChatMessages({
                     <AvatarFallback
                       className={cn(
                         isUser
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-teal-500/10 text-teal-600 dark:text-teal-400"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-teal-500/10 text-teal-600 dark:bg-teal-500/15 dark:text-teal-300"
                       )}
                     >
                       {isUser ? (
@@ -90,7 +90,14 @@ export function ChatMessages({
                     align={isUser ? "end" : "start"}
                     className={cn(!isUser && "max-w-full")}
                   >
-                    <BubbleContent className={cn(!isUser && "w-full max-w-full px-4 py-3")}>
+                    <BubbleContent
+                      className={cn(
+                        "rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                        isUser
+                          ? "bg-primary text-primary-foreground shadow-sm shadow-blue-500/20"
+                          : "w-full max-w-full border border-border/60 bg-card/90 shadow-sm backdrop-blur-md dark:border-white/[0.08] dark:bg-[#12141f]/90 dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.05)]"
+                      )}
+                    >
                       {isUser ? (
                         <span className="whitespace-pre-wrap">
                           {message.content}
@@ -114,7 +121,7 @@ export function ChatMessages({
             <Message align="start">
               <MessageAvatar>
                 <Avatar className="size-8">
-                  <AvatarFallback className="bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                  <AvatarFallback className="bg-teal-500/10 text-teal-600 dark:bg-teal-500/15 dark:text-teal-300">
                     <DevPilotIcon
                       className={cn("size-5", streaming && "animate-pulse")}
                     />
@@ -123,7 +130,7 @@ export function ChatMessages({
               </MessageAvatar>
               <MessageContent>
                 <Bubble variant="muted" align="start" className="max-w-full">
-                  <BubbleContent className="w-full max-w-full px-4 py-3">
+                  <BubbleContent className="w-full max-w-full rounded-2xl border border-border/60 bg-card/90 px-4 py-3 shadow-sm backdrop-blur-md dark:border-white/[0.08] dark:bg-[#12141f]/90 dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.05)]">
                     {streamText ? (
                       <>
                         <ChatMarkdown content={streamText} isStreaming />

@@ -38,22 +38,19 @@ export function ChatView({ repoId }: { repoId: string }) {
   );
   const autoCreateRef = useRef(false);
 
-  const sessionId =
-    selectedSessionId ?? sessionsQuery.data?.[0]?.id ?? null;
+  const sessions = sessionsQuery.data ?? [];
+  const validSelected = sessions.some((s) => s.id === selectedSessionId)
+    ? selectedSessionId
+    : null;
+  const sessionId = validSelected ?? sessions[0]?.id ?? null;
 
   const messagesQuery = useChatMessages(sessionId);
-  const { send, stop, streaming, streamText } = useStreamChat(sessionId);
+  const { send, stop, streaming, streamText } = useStreamChat(sessionId, repoId);
 
   useEffect(() => {
     if (!ready || sessionsQuery.isLoading) return;
-    if (sessionsQuery.data && sessionsQuery.data.length > 0) return;
-    if (
-      !sessionsQuery.isSuccess ||
-      (sessionsQuery.data?.length ?? 0) > 0 ||
-      autoCreateRef.current
-    ) {
-      return;
-    }
+    if (sessions.length > 0) return;
+    if (!sessionsQuery.isSuccess || autoCreateRef.current) return;
 
     autoCreateRef.current = true;
     createSession.mutate(undefined, {
@@ -66,7 +63,7 @@ export function ChatView({ repoId }: { repoId: string }) {
     ready,
     sessionsQuery.isLoading,
     sessionsQuery.isSuccess,
-    sessionsQuery.data,
+    sessions.length,
     createSession,
   ]);
 
@@ -74,8 +71,8 @@ export function ChatView({ repoId }: { repoId: string }) {
     return (
       <AppShell title="Loading chat…">
         <div className="grid flex-1 gap-4 p-4 md:grid-cols-[18rem_1fr]">
-          <Skeleton className="min-h-80 rounded-2xl" />
-          <Skeleton className="min-h-80 rounded-2xl" />
+          <Skeleton className="min-h-80 rounded-2xl dark:bg-white/[0.05]" />
+          <Skeleton className="min-h-80 rounded-2xl dark:bg-white/[0.05]" />
         </div>
       </AppShell>
     );
@@ -88,7 +85,9 @@ export function ChatView({ repoId }: { repoId: string }) {
           <p className="text-sm text-muted-foreground">
             {(repoQuery.error as Error)?.message ?? "Repository not found"}
           </p>
-          <Button nativeButton={false} render={<Link href="/dashboard" />}>Back to dashboard</Button>
+          <Button nativeButton={false} render={<Link href="/dashboard" />}>
+            Back to dashboard
+          </Button>
         </div>
       </AppShell>
     );
@@ -105,7 +104,13 @@ export function ChatView({ repoId }: { repoId: string }) {
           : "Waiting for indexing to finish"
       }
       actions={
-        <Button variant="outline" size="sm" nativeButton={false} render={<Link href="/dashboard" />}>
+        <Button
+          variant="outline"
+          size="sm"
+          nativeButton={false}
+          className="dark:border-white/10 dark:hover:bg-white/[0.06]"
+          render={<Link href="/dashboard" />}
+        >
           <ArrowLeft data-icon="inline-start" />
           Repos
         </Button>
@@ -126,7 +131,7 @@ export function ChatView({ repoId }: { repoId: string }) {
           onSelectSession={setSelectedSessionId}
         />
 
-        <section className="flex min-h-[70vh] min-w-0 flex-1 flex-col">
+        <section className="flex min-h-[70vh] min-w-0 flex-1 flex-col bg-background/50 dark:bg-[#08090e]/60">
           {!ready ? (
             <IndexingState repo={repo} status={statusQuery.data} />
           ) : (

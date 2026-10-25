@@ -48,30 +48,31 @@ export function RepoCard({ repo }: { repo: Repository }) {
   return (
     <article
       className={cn(
-        "group animate-fade-up flex flex-col overflow-hidden rounded-2xl border border-dashed bg-card/80 shadow-md shadow-foreground/5 transition-all",
+        "group animate-fade-up flex flex-col overflow-hidden rounded-2xl border bg-card/90 transition-all",
+        "shadow-sm dark:bg-[#0f1118]/85 dark:backdrop-blur-md dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.05)]",
         isFailed
-          ? "border-destructive/30 bg-destructive/2 hover:border-destructive/40"
+          ? "border-destructive/30 bg-destructive/2 hover:border-destructive/40 dark:border-destructive/30"
           : isExpired
-            ? "border-amber-500/30 bg-amber-500/2 hover:border-amber-500/40"
-            : "border-border/80 hover:-translate-y-0.5 hover:border-foreground/15 hover:shadow-lg hover:shadow-foreground/10"
+            ? "border-amber-500/30 bg-amber-500/2 hover:border-amber-500/40 dark:border-amber-500/30"
+            : "border-border/80 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md dark:border-white/[0.08] dark:hover:border-white/[0.18] dark:hover:bg-[#131622]/90"
       )}
     >
-      <div className="border-b border-dashed border-border/70 p-4">
+      <div className="border-b border-border/70 p-4 dark:border-white/[0.06]">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3">
             <LanguageBadge language={repo.language} showLabel={false} />
             <div className="min-w-0">
               <p className="truncate text-xs text-muted-foreground">{repo.owner}</p>
-              <h3 className="truncate font-medium">{repo.name}</h3>
+              <h3 className="truncate font-semibold tracking-tight text-foreground">{repo.name}</h3>
             </div>
           </div>
           <IndexStatusBadge status={repo.indexStatus} />
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="flex flex-1 flex-col gap-3.5 p-4">
         {!isFailed && (
-          <p className="line-clamp-2 min-h-10 text-sm text-muted-foreground">
+          <p className="line-clamp-2 min-h-10 text-sm text-muted-foreground leading-relaxed">
             {repo.description || "No description provided."}
           </p>
         )}
@@ -82,19 +83,19 @@ export function RepoCard({ repo }: { repo: Repository }) {
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
           {repo.isPrivate && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-dashed px-2 py-0.5 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/80 px-2.5 py-0.5 text-xs text-muted-foreground dark:border-white/10 dark:bg-white/[0.03]">
               <Lock className="size-3" />
               Private
             </span>
           )}
-          <span className="inline-flex items-center gap-1 rounded-full border border-dashed px-2 py-0.5 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1 rounded-full border border-border/80 px-2.5 py-0.5 text-xs text-muted-foreground dark:border-white/10 dark:bg-white/[0.03]">
             <GitBranch className="size-3" />
             {repo.defaultBranch}
           </span>
           {repo.language && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed px-2 py-0.5 text-xs">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/80 px-2.5 py-0.5 text-xs dark:border-white/10 dark:bg-white/[0.03]">
               <LanguageIcon language={repo.language} size="sm" />
               {repo.language}
             </span>
@@ -102,7 +103,7 @@ export function RepoCard({ repo }: { repo: Repository }) {
           {repo.chunkCount > 0 && (
             <span
               className={cn(
-                "rounded-full border border-dashed px-2 py-0.5 text-xs",
+                "rounded-full border border-border/80 px-2.5 py-0.5 text-xs dark:border-white/10 dark:bg-white/[0.03]",
                 isFailed
                   ? "border-destructive/20 text-destructive/80"
                   : "text-muted-foreground"
@@ -115,9 +116,9 @@ export function RepoCard({ repo }: { repo: Repository }) {
         </div>
 
         {isIndexing && (
-          <div className="space-y-2 rounded-xl border border-dashed bg-muted/30 p-3">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Indexing…</span>
+          <div className="space-y-2 rounded-xl border border-blue-500/20 bg-blue-500/5 p-3 dark:border-blue-500/30 dark:bg-blue-500/10">
+            <div className="flex items-center justify-between text-xs text-blue-600 dark:text-blue-300">
+              <span className="font-medium">Indexing repository…</span>
               <span>
                 {repo.filesProcessed}/{repo.filesTotal || "?"}
               </span>
@@ -131,7 +132,7 @@ export function RepoCard({ repo }: { repo: Repository }) {
         )}
 
         {isExpired && (
-          <div className="flex items-start gap-2 rounded-xl border border-dashed border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-600 dark:text-amber-400">
+          <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-amber-600 dark:text-amber-400">
             <Clock className="mt-0.5 size-3.5 shrink-0" />
             <span>
               This repository&apos;s index expired after {5} days. Re-index it
@@ -141,15 +142,16 @@ export function RepoCard({ repo }: { repo: Repository }) {
         )}
       </div>
 
-      <div className="mt-auto flex items-center justify-between gap-2 border-t border-dashed border-border/70 p-4">
+      <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/70 p-4 dark:border-white/[0.06]">
         {repo.htmlUrl ? (
           <Button
             variant="ghost"
             size="sm"
             nativeButton={false}
+            className="text-xs text-muted-foreground hover:text-foreground dark:hover:bg-white/[0.05]"
             render={<a href={repo.htmlUrl} target="_blank" rel="noreferrer" />}
           >
-            <ExternalLink data-icon="inline-start" />
+            <ExternalLink className="size-3.5" data-icon="inline-start" />
             GitHub
           </Button>
         ) : (
@@ -158,15 +160,25 @@ export function RepoCard({ repo }: { repo: Repository }) {
 
         <div className="flex gap-2">
           {repo.indexStatus === "READY" && (
-            <Button variant="secondary" size="sm" onClick={openChat}>
-              <MessageSquare data-icon="inline-start" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={openChat}
+              className="text-xs font-medium dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
+            >
+              <MessageSquare className="size-3.5" data-icon="inline-start" />
               Chat
             </Button>
           )}
           <Button
             size="sm"
             variant={isFailed ? "outline" : "default"}
-            className={cn(isFailed && "border-destructive/30 text-destructive hover:bg-destructive/10")}
+            className={cn(
+              "text-xs font-medium shadow-sm transition-all",
+              isFailed
+                ? "border-destructive/30 text-destructive hover:bg-destructive/10"
+                : "dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
+            )}
             disabled={isIndexing}
             onClick={handlePrimary}
           >
@@ -178,21 +190,21 @@ export function RepoCard({ repo }: { repo: Repository }) {
             ) : repo.indexStatus === "READY" ? (
               <>
                 Open
-                <ArrowRight data-icon="inline-end" />
+                <ArrowRight className="size-3.5" data-icon="inline-end" />
               </>
             ) : isFailed ? (
               <>
-                <RotateCcw data-icon="inline-start" />
+                <RotateCcw className="size-3.5" data-icon="inline-start" />
                 Retry
               </>
             ) : isExpired ? (
               <>
-                <RotateCcw data-icon="inline-start" />
+                <RotateCcw className="size-3.5" data-icon="inline-start" />
                 Re-index
               </>
             ) : (
               <>
-                <Sparkles data-icon="inline-start" />
+                <Sparkles className="size-3.5" data-icon="inline-start" />
                 Index
               </>
             )}

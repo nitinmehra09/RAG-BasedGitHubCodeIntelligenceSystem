@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +20,7 @@ import devPilot.backend.dto.ChatMessageRequest;
 import devPilot.backend.dto.ChatMessageResponse;
 import devPilot.backend.dto.ChatSessionResponse;
 import devPilot.backend.dto.CreateChatSessionRequest;
+import devPilot.backend.dto.UpdateChatSessionRequest;
 import devPilot.backend.security.CurrentUser;
 import devPilot.backend.services.ChatService;
 import jakarta.validation.Valid;
@@ -44,6 +47,21 @@ public class ChatController {
         return chatService.listSessions(userId, repositoryId);
     }
 
+    @DeleteMapping("/sessions/{id}")
+    public ResponseEntity<Void> deleteSession(@PathVariable UUID id) {
+        UUID userId = currentUser.require().getId();
+        chatService.deleteSession(userId, id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/sessions/{id}")
+    public ResponseEntity<ChatSessionResponse> updateSessionTitle(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateChatSessionRequest request) {
+        UUID userId = currentUser.require().getId();
+        return ResponseEntity.ok(chatService.updateSessionTitle(userId, id, request.title()));
+    }
+
     @GetMapping("/sessions/{id}")
     public List<ChatMessageResponse> getMessages(@PathVariable UUID id) {
         UUID userId = currentUser.require().getId();
@@ -58,3 +76,4 @@ public class ChatController {
         return chatService.streamReply(userId, id, request.content());
     }
 }
+

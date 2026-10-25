@@ -53,10 +53,10 @@ function FilterPill({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+        "rounded-full border px-3 py-1 text-xs font-medium transition-all",
         active
-          ? "border-foreground/20 bg-foreground text-background shadow-sm"
-          : "border-dashed border-border bg-background text-muted-foreground hover:border-foreground/20 hover:text-foreground"
+          ? "border-foreground/20 bg-foreground text-background shadow-sm dark:bg-white dark:text-black dark:border-white"
+          : "border-border/80 bg-background/60 text-muted-foreground hover:border-foreground/30 hover:text-foreground dark:border-white/10 dark:bg-white/[0.03] dark:hover:bg-white/[0.07] dark:hover:text-white"
       )}
     >
       {children}
@@ -77,13 +77,13 @@ export function DashboardHeader({
   isSyncing,
 }: DashboardHeaderProps) {
   return (
-    <div className="sticky top-0 z-20 border-b bg-background/85 backdrop-blur-xl">
+    <div className="sticky top-0 z-20 border-b border-border/70 bg-background/80 backdrop-blur-xl dark:border-white/[0.08] dark:bg-[#090a0f]/80">
       <div className="flex flex-col gap-4 px-4 py-4 md:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <SidebarTrigger className="-ml-1 mt-0.5" />
             <div className="min-w-0">
-              <h1 className="font-heading text-xl font-semibold tracking-tight">
+              <h1 className="font-heading text-xl font-semibold tracking-tight text-foreground">
                 Repositories
               </h1>
               <p className="text-sm text-muted-foreground">
@@ -101,13 +101,13 @@ export function DashboardHeader({
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search repositories…"
-                className="border-dashed bg-background pl-9 shadow-sm"
+                className="rounded-xl border border-border/80 bg-background/80 pl-9 text-sm shadow-sm dark:border-white/10 dark:bg-white/[0.04]"
               />
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                className="border-dashed shadow-sm"
+                className="rounded-xl border border-border/80 shadow-sm dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
                 onClick={onSync}
                 disabled={isSyncing}
               >
@@ -122,7 +122,7 @@ export function DashboardHeader({
           </div>
         </div>
 
-        <Separator className="opacity-60" />
+        <Separator className="opacity-60 dark:bg-white/[0.08]" />
 
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-2">

@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
 
-import { api, type ChatMessage } from "@/lib/api";
+import { api, type ChatMessage, type ChatSession } from "@/lib/api";
 import { queryKeys } from "@/lib/query-keys";
 import { streamChatMessage } from "@/lib/stream-chat";
 import { toast } from "@/components/ui/toast";
@@ -49,7 +49,58 @@ export function useCreateChatSession(repositoryId: string) {
   });
 }
 
-export function useStreamChat(sessionId: string | null) {
+export function useDeleteChatSession(repositoryId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sessionId: string) => api.deleteSession(sessionId),
+    onSuccess: (_, sessionId) => {
+      queryClient.setQueryData<ChatSession[]>(
+        queryKeys.chat.sessions(repositoryId),
+        (current) => current?.filter((s) => s.id !== sessionId) ?? []
+      );
+      queryClient.removeQueries({
+        queryKey: queryKeys.chat.messages(sessionId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.chat.sessions(repositoryId),
+      });
+      toast.add({
+        title: "Chat deleted",
+        description: "The conversation was removed.",
+        type: "info",
+      });
+    },
+    onError: (error: Error) => {
+      toast.add({
+        title: "Could not delete chat",
+        description: error.message,
+        type: "error",
+      });
+    },
+  });
+}
+
+export function useUpdateChatSessionTitle(repositoryId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ sessionId, title }: { sessionId: string; title: string }) =>
+      api.updateSessionTitle(sessionId, title),
+    onSuccess: (updated) => {
+      queryClient.setQueryData<ChatSession[]>(
+        queryKeys.chat.sessions(repositoryId),
+        (current) =>
+          current?.map((s) => (s.id === updated.id ? { ...s, title: updated.title } : s)) ?? []
+      );
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.chat.sessions(repositoryId),
+      });
+    },
+  });
+}
+
+export function useStreamChat(sessionId: string | null, repositoryId?: string) {
   const queryClient = useQueryClient();
   const [streaming, setStreaming] = useState(false);
   const [streamText, setStreamText] = useState("");
@@ -64,10 +115,11 @@ export function useStreamChat(sessionId: string | null) {
       abortRef.current = controller;
 
       const optimisticId = `temp-${Date.now()}`;
+      const trimmed = content.trim();
       const optimistic: ChatMessage = {
         id: optimisticId,
         role: "USER",
-        content: content.trim(),
+        content: trimmed,
         citations: [],
         createdAt: new Date().toISOString(),
       };
@@ -77,11 +129,26 @@ export function useStreamChat(sessionId: string | null) {
         (prev) => [...(prev ?? []), optimistic]
       );
 
+      // Optimistically update session title if it was "New chat" or "Chat with ..."
+      if (repositoryId) {
+        const smartTitle = trimmed.length > 50 ? trimmed.slice(0, 47) + "…" : trimmed;
+        queryClient.setQueryData<ChatSession[]>(
+          queryKeys.chat.sessions(repositoryId),
+          (current) =>
+            current?.map((s) =>
+              s.id === sessionId &&
+              (!s.title || s.title === "New chat" || s.title.startsWith("Chat with "))
+                ? { ...s, title: smartTitle }
+                : s
+            ) ?? []
+        );
+      }
+
       setStreaming(true);
       setStreamText("");
 
       try {
-        await streamChatMessage(sessionId, content.trim(), {
+        await streamChatMessage(sessionId, trimmed, {
           signal: controller.signal,
           onUserMessage: (message) => {
             queryClient.setQueryData<ChatMessage[]>(
@@ -101,6 +168,11 @@ export function useStreamChat(sessionId: string | null) {
               (prev) => [...(prev ?? []), message]
             );
             setStreamText("");
+            if (repositoryId) {
+              void queryClient.invalidateQueries({
+                queryKey: queryKeys.chat.sessions(repositoryId),
+              });
+            }
           },
           onError: (err) => {
             console.error("Stream SSE error:", err);
@@ -132,7 +204,7 @@ export function useStreamChat(sessionId: string | null) {
         setStreaming(false);
       }
     },
-    [sessionId, streaming, queryClient]
+    [sessionId, streaming, queryClient, repositoryId]
   );
 
   const stop = useCallback(() => {

@@ -82,10 +82,21 @@ public class ChatService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public ChatSession requireSession(UUID userId, UUID sessionId) {
-        return chatSessionRepository.findByIdAndUserId(sessionId, userId)
-                .orElseThrow(() -> new NotFoundException("Chat session not found"));
+    @Transactional
+    public void deleteSession(UUID userId, UUID sessionId) {
+        ChatSession session = requireSession(userId, sessionId);
+        chatMessageRepository.deleteBySessionId(session.getId());
+        chatSessionRepository.delete(session);
+    }
+
+    @Transactional
+    public ChatSessionResponse updateSessionTitle(UUID userId, UUID sessionId, String title) {
+        ChatSession session = requireSession(userId, sessionId);
+        if (title != null && !title.isBlank()) {
+            session.setTitle(title.trim().substring(0, Math.min(200, title.trim().length())));
+            session = chatSessionRepository.save(session);
+        }
+        return toSessionResponse(session);
     }
 
     public SseEmitter streamReply(UUID userId, UUID sessionId, String userContent) {
@@ -94,6 +105,16 @@ public class ChatService {
         Repository repo = repoService.requireOwned(session.getRepositoryId(), userId);
         if (repo.getIndexStatus() != IndexStatus.READY) {
             throw new BadRequestException("Repository is not ready for chat");
+        }
+
+        // Auto-update session title if it was the default ("New chat" or "Chat with ...")
+        if (session.getTitle() == null || session.getTitle().equals("New chat") || session.getTitle().startsWith("Chat with ")) {
+            String smartTitle = userContent.trim().replaceAll("\\s+", " ");
+            if (smartTitle.length() > 50) {
+                smartTitle = smartTitle.substring(0, 47) + "…";
+            }
+            session.setTitle(smartTitle);
+            chatSessionRepository.save(session);
         }
 
         // 2. Persist the user's message
